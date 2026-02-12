@@ -1,28 +1,736 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accounting Calculator</title>
-</head>
-<body>
-    <h1>Accounting Calculator</h1>
-    <form id="calculator">
-        <label for="amount">Amount:</label>
-        <input type="number" id="amount" name="amount">
-        <label for="rate">Rate:</label>
-        <input type="number" id="rate" name="rate">
-        <button type="button" onclick="calculate()">Calculate</button>
-    </form>
-    <p id="result"></p>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Accounting Onboarding Calculator | Setup Time Estimator</title>
 
-    <script>
-        function calculate() {
-            const amount = parseFloat(document.getElementById('amount').value);
-            const rate = parseFloat(document.getElementById('rate').value);
-            const result = amount * rate;
-            document.getElementById('result').innerText = `Result: $${result.toFixed(2)}`;
+  <style>
+    :root{
+      --text--dark--50: #19191e;
+      --brand--black: #242326;
+      --text--dark--40: #4c4d57;
+      --text--dark--30: #777989;
+      --card-light-grey: #f8f8f8;
+      --accent--blue--300: #527dff;
+      --accent-blue--200: #7a9cff;
+      --accent-blue--100: #a3baff;
+      --accent-blue--50: #b8caff;
+      --text--dark--20: #a8aabb;
+      --action-primary-blue: #2147f4;
+      --white: #ffffff;
+      --light-grey: #ccc;
+      --ui--underline--light-grey: #e5e5e5;
+      --success-green: #bde4b9;
+      --brand--yellow: #f1c238;
+      --brand-accent--mandarin-light: #f6be9d;
+      --brand-accent--dusty-red-light: #f9b4bc;
+      --brand--secondary--lightgreen: #beffd8;
+      --white-smoke: #fde8eb;
+      --brand-accent--cream: #f5ede5;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* iframe-friendly defaults */
+    html, body { width: 100%; height: 100%; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      line-height: 20px;
+      color: #333;
+      background: #fff;
+      padding: 0;
+      margin: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 40px 16px;
+    }
+
+    /* Optional video embed */
+    .video-card{
+      background: var(--white);
+      border: 1px solid var(--ui--underline--light-grey);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .video-title{
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text--dark--50);
+      margin-bottom: 10px;
+    }
+    .video-embed {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 */
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
+    }
+    .video-embed iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .header { text-align: center; margin: 10px 0 28px 0; }
+
+    .page-label{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .page-label-line{ width: 32px; height: 2px; background: var(--accent-blue--200); }
+    .label-text{
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-blue--200);
+    }
+
+    h1{
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text--dark--50);
+      margin-bottom: 12px;
+      line-height: 1.25;
+    }
+
+    .subtitle{
+      font-size: 15px;
+      color: var(--text--dark--30);
+      max-width: 720px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    .calculator-card{
+      background: var(--white);
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid var(--ui--underline--light-grey);
+    }
+
+    .important-note{
+      background: var(--white-smoke);
+      border-left: 3px solid var(--brand-accent--dusty-red-light);
+      padding: 16px 16px;
+      border-radius: 4px;
+      margin-bottom: 18px;
+    }
+    .important-note-title{
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text--dark--50);
+      margin-bottom: 6px;
+    }
+    .important-note-text{
+      color: var(--text--dark--40);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .timing-test-section{
+      background: linear-gradient(135deg, var(--accent-blue--50) 0%, var(--accent-blue--100) 100%);
+      padding: 18px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      border: 1px solid var(--accent-blue--200);
+    }
+    .timing-test-header{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .timing-icon{ font-size: 28px; line-height: 1; }
+    .timing-test-title{
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text--dark--50);
+      margin-bottom: 2px;
+    }
+    .timing-test-subtitle{
+      font-size: 13px;
+      color: var(--text--dark--40);
+      line-height: 1.4;
+    }
+
+    .timing-instructions{
+      background: var(--white);
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      border-left: 3px solid var(--action-primary-blue);
+    }
+    .timing-instructions p{
+      font-size: 13px;
+      color: var(--text--dark--40);
+      line-height: 1.5;
+    }
+
+    .timing-input-group{ display:flex; flex-direction:column; gap:8px; }
+    .timing-label{
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text--dark--50);
+    }
+
+    input[type="number"], input[type="date"]{
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 14px;
+      border: 1px solid var(--light-grey);
+      border-radius: 6px;
+      background: var(--white);
+      color: var(--text--dark--50);
+      transition: 0.15s ease;
+    }
+    input[type="number"]:focus, input[type="date"]:focus{
+      outline:none;
+      border-color: var(--action-primary-blue);
+      box-shadow: 0 0 0 2px rgba(33,71,244,0.12);
+    }
+
+    .calculate-average-btn, .calculate-btn{
+      padding: 12px 18px;
+      background: var(--action-primary-blue);
+      color: var(--white);
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s ease;
+      white-space: nowrap;
+    }
+    .calculate-average-btn:hover, .calculate-btn:hover{
+      background: var(--accent--blue--300);
+    }
+
+    .average-result{
+      margin-top: 12px;
+      background: var(--white);
+      padding: 12px;
+      border-radius: 6px;
+      border-left: 3px solid var(--success-green);
+    }
+    #calculatedAverage{
+      color: var(--action-primary-blue);
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .slider-section{
+      margin-bottom: 18px;
+      padding: 16px;
+      background: var(--card-light-grey);
+      border-radius: 6px;
+      border: 1px solid var(--ui--underline--light-grey);
+    }
+    .input-label{
+      display:block;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text--dark--50);
+      margin-bottom: 6px;
+    }
+    .input-help-text{
+      font-size: 13px;
+      color: var(--text--dark--30);
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    input[type="range"]{
+      width: 100%;
+      height: 8px;
+      border-radius: 6px;
+      background: var(--ui--underline--light-grey);
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--action-primary-blue);
+      border: 3px solid var(--white);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb{
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--action-primary-blue);
+      border: 3px solid var(--white);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+    .slider-value-display{
+      margin-top: 10px;
+      text-align:center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--action-primary-blue);
+    }
+    #sliderValue{ font-size: 22px; font-weight: 800; }
+
+    .input-section{ margin-bottom: 18px; }
+    .input-wrapper{
+      display:flex;
+      gap:10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .input-wrapper input[type="number"]{ flex: 1; min-width: 220px; }
+    .input-wrapper .calculate-btn{ flex: 0 0 auto; }
+
+    .info-section{
+      background: var(--brand-accent--cream);
+      border-left: 3px solid var(--accent--blue--300);
+      padding: 16px;
+      border-radius: 6px;
+      margin-top: 16px;
+    }
+    .info-title{
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text--dark--50);
+      margin-bottom: 10px;
+    }
+    .info-list{ list-style: none; }
+    .info-list li{
+      padding: 6px 0 6px 22px;
+      position: relative;
+      color: var(--text--dark--40);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .info-list li:before{
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent--blue--300);
+      font-weight: 800;
+    }
+
+    .results-section{
+      display:none;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--ui--underline--light-grey);
+    }
+    .results-section.visible{ display:block; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+    .breakdown-section{
+      margin-top: 14px;
+      padding: 16px;
+      background: var(--white-smoke);
+      border-radius: 6px;
+      border: 1px solid var(--brand-accent--dusty-red-light);
+    }
+    .breakdown-title{
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text--dark--50);
+      margin-bottom: 10px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .breakdown-text{
+      color: var(--text--dark--40);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .go-live-section{
+      margin-top: 14px;
+      padding: 18px;
+      background: linear-gradient(135deg, var(--accent--blue--300) 0%, var(--accent-blue--200) 100%);
+      border-radius: 6px;
+      color: var(--white);
+      text-align:center;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .go-live-date-label{
+      font-size: 11px;
+      font-weight: 800;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+    .go-live-date{
+      font-size: 24px;
+      font-weight: 900;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+    .go-live-description{
+      font-size: 13px;
+      opacity: 0.9;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+    .book-now-btn{
+      display:inline-block;
+      padding: 12px 18px;
+      background: var(--white);
+      color: var(--action-primary-blue);
+      text-decoration:none;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .book-now-btn:hover{ background: var(--accent-blue--50); }
+
+    .results-grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .result-card{
+      background: linear-gradient(135deg, var(--action-primary-blue) 0%, var(--accent--blue--300) 100%);
+      padding: 16px;
+      border-radius: 6px;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .result-card.secondary{
+      background: linear-gradient(135deg, var(--brand--secondary--lightgreen) 0%, var(--success-green) 100%);
+      color: var(--text--dark--50);
+    }
+    .result-card.tertiary{
+      background: linear-gradient(135deg, var(--brand--yellow) 0%, var(--brand-accent--mandarin-light) 100%);
+      color: var(--text--dark--50);
+    }
+    .result-card.quaternary{
+      background: linear-gradient(135deg, var(--accent-blue--200) 0%, var(--accent-blue--100) 100%);
+      color: var(--text--dark--50);
+    }
+    .result-label{
+      font-size: 11px;
+      font-weight: 800;
+      opacity: 0.9;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .result-value{
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 4px;
+      line-height: 1.1;
+    }
+    .result-description{
+      font-size: 13px;
+      opacity: 0.9;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 720px){
+      h1{ font-size: 26px; }
+      .calculator-card{ padding: 18px; }
+      .results-grid{ grid-template-columns: 1fr; }
+      .input-wrapper{ flex-direction: column; align-items: stretch; }
+      .input-wrapper .calculate-btn{ width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- OPTIONAL: video embed (delete this whole block if you don't want a video) -->
+    <div class="video-card">
+      <div class="video-title">Quick walkthrough (optional)</div>
+      <div class="video-embed">
+        <!-- Replace the src with YouTube/Vimeo/etc -->
+        <iframe
+          src="https://www.youtube.com/embed/VIDEO_ID_HERE"
+          title="Video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+
+    <div class="header">
+      <div class="page-label">
+        <div class="page-label-line"></div>
+        <span class="label-text">Setup Time Estimator</span>
+      </div>
+      <h1>Accounting Onboarding Calculator</h1>
+      <p class="subtitle">
+        Plan your Street setup with confidence. Calculate how much time you'll need for accounting and managed property onboarding.
+      </p>
+    </div>
+
+    <div class="calculator-card">
+      <div class="important-note">
+        <div class="important-note-title">Important Note</div>
+        <div class="important-note-text">
+          This time estimate does not include the time needed to add tenancies into Street — we recommend loading your tenancies before starting the accounting onboarding phase.
+        </div>
+      </div>
+
+      <div class="timing-test-section" id="timingTestSection">
+        <div class="timing-test-header">
+          <div class="timing-icon">⏱️</div>
+          <div>
+            <div class="timing-test-title">Get a More Accurate Estimate</div>
+            <div class="timing-test-subtitle">Test yourself in the demo account for a personalised calculation</div>
+          </div>
+        </div>
+
+        <div class="timing-instructions">
+          <p><strong>How it works:</strong> Add 4 properties into your demo account and time how long it takes. This will give you a personalised average time per property.</p>
+        </div>
+
+        <div class="timing-input-group">
+          <label class="timing-label">How long did it take to add 4 properties? (in minutes)</label>
+          <input type="number" id="testTime" placeholder="e.g., 85" min="1" step="1" />
+          <button class="calculate-average-btn" onclick="calculateAverage()">Calculate My Average</button>
+        </div>
+
+        <div id="averageResult" class="average-result" style="display:none;">
+          <div>
+            <strong>Your average:</strong> <span id="calculatedAverage">-</span> minutes per property
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-section">
+        <label class="input-label">Time per Property (minutes)</label>
+        <p class="input-help-text">
+          Based on our experience, most agents average <strong>20 minutes per property</strong>. Use the slider to adjust based on your own testing or preference.
+        </p>
+        <input type="range" id="timeSlider" min="5" max="60" value="20" step="1" />
+        <div class="slider-value-display">
+          <span id="sliderValue">20</span> minutes per property
+        </div>
+      </div>
+
+      <div class="input-section">
+        <label class="input-label" for="propertyCount">Number of Managed/Rent Collection Tenancies</label>
+        <div class="input-wrapper">
+          <input type="number" id="propertyCount" placeholder="e.g., 100" min="1" />
+          <button class="calculate-btn" onclick="calculateTime()">Calculate</button>
+        </div>
+      </div>
+
+      <div class="input-section">
+        <label class="input-label" for="frontEndGoLive">Street Front-End Go-Live Date (Optional)</label>
+        <p class="input-help-text">
+          If you've already set a go-live date with your onboarding team, enter it here. We'll schedule accounting go-live for 2 weeks after.
+        </p>
+        <input type="date" id="frontEndGoLive" />
+      </div>
+
+      <div class="info-section" id="generalGuidance">
+        <div class="info-title">General Guidance</div>
+        <ul class="info-list">
+          <li><strong>Smaller agents (around 100 properties):</strong> typically finish in 1-2 weeks</li>
+          <li><strong>Larger agents (500–1,000+ properties):</strong> often need several weeks</li>
+          <li><strong>On average:</strong> we recommend allowing for a full rent cycle (around a month) to complete setup alongside your daily work</li>
+        </ul>
+        <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--ui--underline--light-grey); color: var(--text--dark--40);">
+          <strong>This approach helps you set up Street gradually without disruption, ready to go live at the start of your next rent cycle.</strong>
+        </p>
+      </div>
+
+      <div id="results" class="results-section">
+        <div class="breakdown-section">
+          <div class="breakdown-title"><span>📊</span><span>Your Breakdown</span></div>
+          <div class="breakdown-text" id="breakdownText"></div>
+        </div>
+
+        <div class="go-live-section">
+          <div class="go-live-date-label">Suggested Go-Live Date</div>
+          <div class="go-live-date" id="goLiveDate">-</div>
+          <div class="go-live-description" id="goLiveDescription">Based on starting today and completing all onboarding tasks</div>
+          <a
+            href="https://info.street.co.uk/meetings/amy-dawber/street-accounting-opening-balances-suspense-account-setup"
+            target="_blank"
+            rel="noopener"
+            class="book-now-btn"
+          >Book Your Opening Balance Call</a>
+        </div>
+
+        <div class="results-grid">
+          <div class="result-card tertiary">
+            <div class="result-label">Recommended Timeline</div>
+            <div class="result-value" id="recommendedDays">-</div>
+            <div class="result-description">days including training + workload</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">Total Time Required</div>
+            <div class="result-value" id="totalHours">-</div>
+            <div class="result-description">hours of focused setup work</div>
+          </div>
+          <div class="result-card secondary">
+            <div class="result-label">Working Days</div>
+            <div class="result-value" id="workingDays">-</div>
+            <div class="result-description">based on 8-hour workdays</div>
+          </div>
+          <div class="result-card quaternary">
+            <div class="result-label">Demo Account Training</div>
+            <div class="result-value">14</div>
+            <div class="result-description">days accounting training in demo account</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function calculateAverage() {
+      const testTime = parseFloat(document.getElementById('testTime').value);
+      if (!testTime || testTime < 1) {
+        alert('Please enter how long it took to add 4 properties');
+        return;
+      }
+      const average = Math.round(testTime / 4);
+      document.getElementById('calculatedAverage').textContent = average;
+      document.getElementById('averageResult').style.display = 'block';
+      document.getElementById('timeSlider').value = average;
+      document.getElementById('sliderValue').textContent = average;
+      document.getElementById('timeSlider').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    document.getElementById('timeSlider').addEventListener('input', function () {
+      document.getElementById('sliderValue').textContent = this.value;
+    });
+
+    function calculateTime() {
+      const propertyCount = parseInt(document.getElementById('propertyCount').value);
+      if (!propertyCount || propertyCount < 1) {
+        alert('Please enter a valid number of properties');
+        return;
+      }
+
+      const MINUTES_PER_PROPERTY = parseInt(document.getElementById('timeSlider').value);
+      const HOURS_PER_DAY = 8;
+      const TRAINING_DAYS = 14;
+      const bufferDays = 7;
+
+      const totalMinutes = propertyCount * MINUTES_PER_PROPERTY;
+      const totalHours = Math.round(totalMinutes / 60);
+      const workingDays = Math.round(totalHours / HOURS_PER_DAY);
+      const recommendedDays = workingDays + TRAINING_DAYS + bufferDays;
+
+      const standardGoLiveDate = addBusinessDays(new Date(), recommendedDays);
+
+      const frontEndInput = document.getElementById('frontEndGoLive').value;
+      let finalGoLiveDate = standardGoLiveDate;
+      let usingFrontEndDate = false;
+
+      if (frontEndInput) {
+        const frontEndDate = new Date(frontEndInput + 'T00:00:00');
+        const today = new Date(); today.setHours(0,0,0,0);
+
+        if (frontEndDate >= today) {
+          const accountingGoLive = addBusinessDays(frontEndDate, 10);
+          if (accountingGoLive > standardGoLiveDate) {
+            finalGoLiveDate = accountingGoLive;
+            usingFrontEndDate = true;
+          }
         }
-    </script>
+      }
+
+      document.getElementById('totalHours').textContent = totalHours;
+      document.getElementById('workingDays').textContent = workingDays;
+      document.getElementById('recommendedDays').textContent = recommendedDays;
+      document.getElementById('goLiveDate').textContent = formatDate(finalGoLiveDate);
+
+      const goLiveDesc = document.getElementById('goLiveDescription');
+      goLiveDesc.textContent = usingFrontEndDate
+        ? 'Based on 2 weeks after your Street front-end go-live date'
+        : 'Based on starting today and completing all onboarding tasks';
+
+      let sizeCategory = '';
+      let timelineAdvice = '';
+      if (propertyCount <= 150) {
+        sizeCategory = 'small to medium';
+        timelineAdvice = 'most agents in your situation complete setup in 1-2 weeks (plus 14 days training)';
+      } else if (propertyCount <= 500) {
+        sizeCategory = 'medium to large';
+        timelineAdvice = 'most agents in your situation complete setup in 2-4 weeks (plus 14 days training)';
+      } else {
+        sizeCategory = 'large';
+        timelineAdvice = 'most agents in your situation complete setup in several weeks to a month (plus 14 days training)';
+      }
+
+      let breakdownText = `
+        <strong>${propertyCount} managed/rent collection tenancies</strong> × <strong>${MINUTES_PER_PROPERTY} minutes</strong> each
+        = <strong>${totalHours} hours total</strong> (around <strong>${workingDays} full working days</strong> based on an 8-hour day).
+        <br><br>
+        As a <strong>${sizeCategory} agent</strong>, you'll also need to complete <strong>14 days of training in your demo account</strong>
+        before starting the onboarding phase. Combined with keeping up with your day-to-day workload, we suggest allowing
+        <strong>${recommendedDays} working days total</strong>.
+        <br><br>
+        Based on your property count, ${timelineAdvice}. We recommend allowing for a full rent cycle to ensure a smooth setup.
+      `;
+
+      if (usingFrontEndDate) {
+        breakdownText += `<br><br><strong>Note:</strong> Since you've scheduled your Street front-end go-live for ${formatDate(new Date(frontEndInput + 'T00:00:00'))}, we recommend going live with accounting <strong>2 weeks later</strong> to allow proper time for setup and training.`;
+      }
+
+      document.getElementById('breakdownText').innerHTML = breakdownText;
+      document.getElementById('generalGuidance').style.display = 'none';
+
+      document.getElementById('results').classList.add('visible');
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function addBusinessDays(date, days) {
+      let currentDate = new Date(date);
+      let addedDays = 0;
+      while (addedDays < days) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) addedDays++;
+      }
+      return currentDate;
+    }
+
+    function formatDate(date) {
+      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const dayName = days[date.getDay()];
+      const day = date.getDate();
+      const month = months[date.getMonth()];
+      const year = date.getFullYear();
+      const suffix = (d) => {
+        if (d > 3 && d < 21) return 'th';
+        switch (d % 10) { case 1: return 'st'; case 2: return 'nd'; case 3: return 'rd'; default: return 'th'; }
+      };
+      return `${dayName}, ${day}${suffix(day)} ${month} ${year}`;
+    }
+
+    document.getElementById('propertyCount').addEventListener('keypress', function (event) {
+      if (event.key === 'Enter') calculateTime();
+    });
+    document.getElementById('testTime').addEventListener('keypress', function (event) {
+      if (event.key === 'Enter') calculateAverage();
+    });
+  </script>
 </body>
 </html>
